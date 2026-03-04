@@ -31,11 +31,138 @@ def apply_light_css() -> None:
     st.markdown(
         """
         <style>
-        .stApp { background: #f6f7fb; }
-        html, body, [class*="css"] { line-height: 1.35 !important; }
-        .element-container { margin-bottom: 0.55rem; }
-        div[data-testid="stMetricValue"] { font-size: 1.55rem; }
-        div[data-testid="stMetricLabel"] { font-size: 0.95rem; }
+        /* 배경 및 전체 레이아웃 */
+        .stApp { 
+            background: linear-gradient(135deg, #f8f9fc 0%, #f1f4f9 100%);
+        }
+        html, body, [class*="css"] { 
+            line-height: 1.4 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif !important;
+        }
+        
+        /* 메트릭 카드 */
+        div[data-testid="stMetricContainer"] {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.3s ease;
+        }
+        div[data-testid="stMetricContainer"]:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        div[data-testid="stMetricValue"] { 
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        div[data-testid="stMetricLabel"] { 
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        
+        /* 컨테이너 및 섹션 */
+        .element-container { 
+            margin-bottom: 0.8rem;
+        }
+        [data-testid="stVerticalBlockContainer"] {
+            gap: 1rem;
+        }
+        
+        /* 버튼 스타일 */
+        button[kind="primary"] {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+            border: none !important;
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            padding: 0.7rem 1.5rem !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+        }
+        button[kind="primary"]:hover {
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
+            transform: translateY(-2px);
+        }
+        
+        /* 제목 스타일 */
+        h1 {
+            color: #0f172a !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.5px !important;
+        }
+        h2 {
+            color: #1e293b !important;
+            font-weight: 700 !important;
+        }
+        
+        /* 캡션 및 텍스트 */
+        p, [data-testid="stText"] {
+            color: #475569 !important;
+            font-size: 0.95rem !important;
+        }
+        
+        /* 입력 필드 */
+        input, textarea, select {
+            border-radius: 8px !important;
+            border: 1.5px solid #e2e8f0 !important;
+            background: white !important;
+            transition: all 0.2s ease !important;
+            font-size: 0.95rem !important;
+        }
+        input:focus, textarea:focus, select:focus {
+            border: 1.5px solid #2563eb !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+        }
+        
+        /* 슬라이더 */
+        .stSlider {
+            padding: 0.5rem 0 !important;
+        }
+        
+        /* 사이드바 */
+        [data-testid="stSidebar"] {
+            background: white;
+            border-right: 1px solid #e2e8f0;
+        }
+        [data-testid="stSidebar"] h2 {
+            color: #1e293b !important;
+            margin-top: 1.5rem !important;
+        }
+        
+        /* Expander */
+        [data-testid="stExpander"] {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+        }
+        [data-testid="stExpanderDetails"] {
+            padding: 1rem !important;
+        }
+        
+        /* Info, Warning, Error 박스 */
+        [data-testid="stAlert"] {
+            border-radius: 8px !important;
+            border-left: 4px solid !important;
+            background: white !important;
+            padding: 1rem !important;
+        }
+        
+        /* 컬럼 레이아웃 */
+        [data-testid="stHorizontalBlock"] {
+            gap: 1.2rem !important;
+        }
+        
+        /* 디바이더 */
+        hr {
+            margin: 1.5rem 0 !important;
+            border: none !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
         </style>
         """,
         unsafe_allow_html=True,
@@ -558,12 +685,24 @@ def main() -> None:
     apply_light_css()
     init_session_state()
 
-    st.title("📱포트폴리오 시뮬레이터")
-    st.caption("과거 데이터를 바탕으로 ‘가능한 범위’를 보여주는 도구예요. 확정 예측이 아닙니다.")
+    st.title("📊 포트폴리오 시뮬레이터")
+    st.markdown(
+        """
+        <div style='background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%); 
+                    padding: 1rem; border-radius: 10px; border-left: 4px solid #2563eb; 
+                    margin-bottom: 1.5rem;'>
+            <p style='margin: 0; color: #1e40af; font-size: 0.95rem;'>
+                📈 과거 데이터를 바탕으로 <strong>'가능한 범위'</strong>를 보여주는 도구예요. 
+                <br/>확정 예측이 아니며, 투자 결정의 참고 자료로만 사용해주세요.
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
     # ── 사이드바(입력 최소)
     with st.sidebar:
-        st.subheader("입력")
+        st.subheader("⚙️ 입력")
 
         years = st.slider("기간(년)", 5, 40, 30)
         dividend_reinvest = st.checkbox("배당 재투자", value=True)
@@ -573,13 +712,13 @@ def main() -> None:
         goal_amount = st.number_input("목표(원)", 0, 10_000_000_000, 100_000_000, 1_000_000)
 
         st.divider()
-        st.subheader("자산(최대 5개)")
+        st.subheader("💼 자산 구성(최대 5개)")
         st.text_area("티커", key="tickers_input", height=90, help="예: SGOV, QQQM, VOO, 005930.KS")
         st.text_area("비중(%)", key="weights_input", height=90, help="티커 순서대로. 합이 100이어야 합니다.")
 
         run_btn = st.button("🚀 계산하기", use_container_width=True)
 
-        with st.expander("고급 설정", expanded=False):
+        with st.expander("🔧 고급 설정", expanded=False):
             block_label = st.selectbox("블록(월)", ["랜덤(6~12)", "6개월 고정", "9개월 고정", "12개월 고정"], index=0)
             block_mode = "random"
             if block_label == "6개월 고정":
@@ -592,7 +731,7 @@ def main() -> None:
             seed = st.number_input("시드", 0, 1_000_000_000, 42)
 
             st.divider()
-            st.subheader("현실모드(추천)")
+            st.subheader("🎯 현실모드(추천)")
             realistic_mode = st.checkbox("현실모드 사용", value=True)
             lookback_years = st.slider("최근 N년만 사용", 3, 50, 20)
             winsor_pct = st.slider("이상치 완화(%)", 0.0, 2.0, 0.5, 0.1)
@@ -609,7 +748,7 @@ def main() -> None:
     # ── 입력 파싱
     tickers = [t.strip().upper() for t in _split_tokens(st.session_state["tickers_input"])]
     if len(tickers) == 0:
-        st.info("왼쪽(또는 아래)에서 티커를 입력해줘 🙂")
+        st.info("👈 왼쪽 패널에서 **티커와 비중**을 입력하고 **🚀 계산하기**를 눌러주세요!")
         return
     if len(tickers) > 5:
         st.error("티커는 최대 5개까지만 가능해요.")
@@ -651,7 +790,7 @@ def main() -> None:
                 df_src = slice_recent_years(df_base, int(lookback_years))
                 df_src = winsorize_monthly_returns(df_src, float(winsor_pct))
                 if df_src.empty or len(df_src) < (BLOCK_MAX + 1):
-                    raise ValueError("현실모드 적용 후 데이터가 너무 짧아요. 최근 N년을 늘려주세요.")
+                    raise ValueError("현실모드 적용 후 데이터가 부족합니다. 최근 분석 기간을 늘려주세요.")
 
                 if bool(manual_targets):
                     targets_used = parse_target_rates_input(st.session_state.get("target_returns_input", ""), tickers)
@@ -704,7 +843,7 @@ def main() -> None:
 
     # ── 결과 표시(모바일: 금액 먼저)
     if not st.session_state["sim_completed"]:
-        st.info("왼쪽에서 입력하고 **🚀 계산하기**를 눌러줘 🙂")
+        st.info("👈 왼쪽 패널에서 입력하고 **🚀 계산하기**를 눌러주세요!")
         return
 
     terminal = st.session_state["terminal_wealth"]
@@ -715,7 +854,7 @@ def main() -> None:
     total_principal = float(initial_capital) + float(monthly_contribution) * (int(years) * 12)
 
     # 1티어 카드(금액)
-    st.subheader("✅ 결과 요약")
+    st.subheader("✨ 시뮬레이션 결과")
     st.metric("보통은(중앙값)", format_krw_readable(p50))
     c1, c2 = st.columns(2)
     c1.metric("보수적으로(p5)", format_krw_readable(p5))
@@ -728,18 +867,30 @@ def main() -> None:
         st.caption(f"목표 {format_krw_readable(goal_amount)} **만기 달성 확률**: **{pct_str01(goal_prob)}**")
 
     # 미니 메시지
-    st.write(
-        f"👉 {years}년 동안 월 {krw_compact(monthly_contribution)} 기준으로, "
-        f"보통은 **{krw_compact(p50)}**, 보수적으로 **{krw_compact(p5)}**, 낙관적으로 **{krw_compact(p95)}** 정도 범위예요."
+    st.markdown(
+        f"""
+        <div style='background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
+                    padding: 1.2rem; border-radius: 10px; border-left: 4px solid #d97706; 
+                    margin: 1.5rem 0;'>
+            <p style='margin: 0; color: #92400e; font-size: 0.95rem; line-height: 1.6;'>
+                <strong>💡 예상 범위</strong><br/>
+                {years}년 동안 월 <strong>{krw_compact(monthly_contribution)}</strong> 기준으로,<br/>
+                보통은 <span style='color: #2563eb; font-weight: bold;'>{krw_compact(p50)}</span>,
+                보수적으로 <span style='color: #d97706; font-weight: bold;'>{krw_compact(p5)}</span>,
+                낙관적으로 <span style='color: #059669; font-weight: bold;'>{krw_compact(p95)}</span>
+            </p>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     # 그래프는 접기(신뢰 보강)
-    with st.expander("📊 그래프 보기(신뢰 보강용)", expanded=False):
+    with st.expander("� 예상 자산 추이(그래프 보기)", expanded=False):
         st.plotly_chart(make_path_fanchart_mobile(value_path), use_container_width=True, config={"displayModeBar": False})
         st.plotly_chart(make_terminal_hist_mobile(terminal, float(goal_amount)), use_container_width=True, config={"displayModeBar": False})
 
     # 상세/다운로드도 접기
-    with st.expander("🔍 상세(고급)", expanded=False):
+    with st.expander("� 상세 분석(고급)", expanded=False):
         # 리스크(낙폭)
         mdd_med = float(np.median(st.session_state["mdd"]))
         st.caption(f"최대 낙폭(MDD) 중앙값: {mdd_med*100:.1f}% (참고)")
