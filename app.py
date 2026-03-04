@@ -25,8 +25,9 @@ EOK = 1e8
 CASHLIKE_TICKERS = {"SGOV", "BIL", "SHV", "ICSH", "TFLO", "USFR"}
 
 # ─────────────────────────────
-# 스타일 (모바일/라이트)
+# 스타일 (모바일/라이트+다크)
 # ─────────────────────────────
+
 def apply_light_css() -> None:
     st.markdown(
         """
@@ -56,17 +57,17 @@ def apply_light_css() -> None:
         div[data-testid="stMetricValue"] { 
             font-size: 1.8rem;
             font-weight: 700;
-            color: #0f172a;
+            color: #2563eb;
         }
         div[data-testid="stMetricLabel"] { 
             font-size: 0.9rem;
-            color: #64748b;
-            font-weight: 500;
+            color: #0f172a;
+            font-weight: 600;
         }
         
         /* 컨테이너 및 섹션 */
-        .element-container { 
-            margin-bottom: 0.8rem;
+        [data-testid="stContainer"] {
+            border-radius: 12px;
         }
         [data-testid="stVerticalBlockContainer"] {
             gap: 1rem;
@@ -77,45 +78,71 @@ def apply_light_css() -> None:
             background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
             border: none !important;
             border-radius: 8px !important;
-            font-weight: 600 !important;
+            font-weight: 700 !important;
             font-size: 1rem !important;
-            padding: 0.7rem 1.5rem !important;
+            padding: 0.8rem 1.5rem !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+            color: white !important;
         }
         button[kind="primary"]:hover {
             box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4) !important;
             transform: translateY(-2px);
+            background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+        }
+        button[kind="secondary"],
+        button[kind="tertiary"] {
+            color: #2563eb !important;
+            font-weight: 600 !important;
         }
         
         /* 제목 스타일 */
         h1 {
-            color: #0f172a !important;
+            color: #000000 !important;
             font-weight: 800 !important;
             letter-spacing: -0.5px !important;
         }
         h2 {
-            color: #1e293b !important;
+            color: #000000 !important;
+            font-weight: 700 !important;
+        }
+        h3 {
+            color: #000000 !important;
             font-weight: 700 !important;
         }
         
         /* 캡션 및 텍스트 */
         p, [data-testid="stText"] {
-            color: #475569 !important;
+            color: #0f172a !important;
             font-size: 0.95rem !important;
+        }
+        [data-testid="stCaption"] {
+            color: #000000 !important;
+            font-weight: 800 !important;
+            font-size: 0.95rem !important;
+            margin-bottom: 0.5rem;
         }
         
         /* 입력 필드 */
         input, textarea, select {
             border-radius: 8px !important;
-            border: 1.5px solid #e2e8f0 !important;
+            border: 1.5px solid #cbd5e1 !important;
             background: white !important;
             transition: all 0.2s ease !important;
             font-size: 0.95rem !important;
+            color: #000000 !important;
+        }
+        input::placeholder, textarea::placeholder {
+            color: #94a3b8 !important;
         }
         input:focus, textarea:focus, select:focus {
             border: 1.5px solid #2563eb !important;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+            background: #ffffff !important;
+        }
+        label {
+            color: #000000 !important;
+            font-weight: 600 !important;
         }
         
         /* 슬라이더 */
@@ -129,19 +156,53 @@ def apply_light_css() -> None:
             border-right: 1px solid #e2e8f0;
         }
         [data-testid="stSidebar"] h2 {
-            color: #1e293b !important;
+            color: #000000 !important;
             margin-top: 1.5rem !important;
+            font-weight: 800;
+        }
+        [data-testid="stSidebar"] .stSubheader {
+            color: #000000 !important;
+        }
+        
+        /* 사이드바 텍스트 - 더 진한 색 */
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] .stMarkdown,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] .stCaption {
+            color: #000000 !important;
+            font-weight: 600;
+        }
+        
+        /* 사이드바 컨테이너 - 고급 스타일 */
+        [data-testid="stSidebar"] [data-testid="stVerticalBlock"] > div > div > [data-testid="stContainer"] {
+            background: #f0f9ff;
+            border: 1px solid rgba(15,23,42,0.08);
+            border-radius: 12px;
+            padding: 1.2rem !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+        
+        [data-testid="stSidebar"] [data-testid="stContainer"] > label {
+            color: #1a202c !important;
         }
         
         /* Expander */
         [data-testid="stExpander"] {
             background: white;
             border-radius: 8px;
-            border: 1px solid #e2e8f0;
+            border: 2px solid #e0e7ff;
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
         }
         [data-testid="stExpanderDetails"] {
             padding: 1rem !important;
+        }
+        [data-testid="stExpander"] button,
+        [data-testid="stExpander"] summary {
+            color: #000000 !important;
+            font-weight: 600 !important;
         }
         
         /* Info, Warning, Error 박스 */
@@ -150,6 +211,10 @@ def apply_light_css() -> None:
             border-left: 4px solid !important;
             background: white !important;
             padding: 1rem !important;
+        }
+        [data-testid="stAlert"] p {
+            color: #000000 !important;
+            font-weight: 500 !important;
         }
         
         /* 컬럼 레이아웃 */
@@ -163,6 +228,144 @@ def apply_light_css() -> None:
             border: none !important;
             border-top: 1px solid #e2e8f0 !important;
         }
+
+        /* ✅ 사이드바 캡션/라벨 진하게 표시 */
+        [data-testid="stSidebar"] [data-testid="stCaption"] {
+            color: #0b1220 !important;
+            font-weight: 800 !important;
+            opacity: 1 !important;
+            font-size: 0.95rem !important;
+        }
+        [data-testid="stSidebar"] label,
+        [data-testid="stSidebar"] p,
+        [data-testid="stSidebar"] span {
+            color: #0b1220 !important;
+            opacity: 1 !important;
+        }
+
+        /* ✅ BaseWeb 슬라이더/체크박스 텍스트 진하게 */
+        [data-baseweb] * {
+            opacity: 1 !important;
+        }
+        [data-baseweb="slider"] * {
+            color: #0b1220 !important;
+            opacity: 1 !important;
+        }
+        [data-baseweb="slider"] [role="slider"] {
+            background: #2563eb !important;
+            border: 2px solid #ffffff !important;
+        }
+                /* 사이드바 캡션을 '입력' 텍스트 색과 동일하게 */
+                [data-testid="stSidebar"] [data-testid="stCaption"]{
+                    color:#0f172a !important;
+                    font-weight:700 !important;
+                    opacity:1 !important;
+                }
+
+                /* 혹시 다른 캡션 구조가 섞일 경우 대비 */
+                [data-testid="stSidebar"] small{
+                    color:#0f172a !important;
+                    opacity:1 !important;
+                }
+
+                /* BaseWeb 위젯 내부 텍스트도 동일하게 */
+                [data-testid="stSidebar"] [data-baseweb]{
+                    color:#0f172a !important;
+                }
+
+                /* 모바일 토큰: 폰에서 글자/간격 줄이기 */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.6rem !important; }
+                    h2 { font-size: 1.2rem !important; }
+                    div[data-testid="stMetricValue"]{ font-size: 1.4rem !important; }
+                    div[data-testid="stMetricContainer"]{ padding: 0.85rem !important; }
+                    [data-testid="stHorizontalBlock"]{ gap: 0.7rem !important; }
+                    /* 컨테이너 패딩 축소 */
+                    div[data-testid="stContainer"]{ padding: 0.85rem !important; }
+                    /* 메트릭 라벨/값 폰트 축소 */
+                    div[data-testid="stMetricLabel"]{ font-size: 0.85rem !important; }
+                }
+                </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
+def apply_dark_css() -> None:
+    st.markdown("""
+        <style>
+        /* Dark theme tokens */
+        :root {
+            --bg: #0b1220;
+            --card: #0f1726;
+            --muted: #a9b4c7; /* 요청된 muted */
+            --text: #e8eef9;  /* 요청된 텍스트 */
+            --accent: #0284c7;
+            --accent-strong: #2563eb;
+            --glass: rgba(255,255,255,0.03);
+        }
+
+        .stApp { background: var(--bg) !important; color: var(--text) !important; }
+        html, body, [class*="css"] { color: var(--text) !important; font-smooth: always; }
+
+        /* Cards & panels */
+        div[data-testid="stMetricContainer"],
+        [data-testid="stSidebar"] .element-container,
+        [data-testid="stExpander"],
+        [data-testid="stAlert"],
+        [data-testid="stContainer"] {
+            background: linear-gradient(180deg, var(--card), #0b1220) !important;
+            border: 1px solid rgba(255,255,255,0.04) !important;
+            color: var(--text) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 6px 20px rgba(2,132,199,0.06) !important;
+        }
+
+        /* Text tokens */
+        h1,h2,h3,p,label,[data-testid="stText"],[data-testid="stMarkdown"] { color: var(--text) !important; }
+        [data-testid="stCaption"] { color: var(--text) !important; opacity: 1 !important; font-weight: 800 !important; }
+        .muted, [data-testid="stMetricLabel"] { color: var(--muted) !important; }
+
+        /* Buttons */
+        button[kind="primary"] { background: linear-gradient(135deg,var(--accent-strong),#1d4ed8) !important; color: #fff !important; border-radius: 8px !important; }
+
+        /* BaseWeb specific overrides (slider / checkbox / radio) */
+        /* Slider track */
+        [data-baseweb="slider"] .rc-slider-rail,
+        [data-baseweb="slider"] .rc-slider-track {
+            background: rgba(255,255,255,0.06) !important;
+            height: 8px !important;
+            border-radius: 999px !important;
+            box-shadow: none !important;
+        }
+        /* Slider handle (thumb) */
+        [data-baseweb="slider"] .rc-slider-handle {
+            background: var(--accent) !important;
+            border: 2px solid #fff !important;
+            box-shadow: 0 6px 18px rgba(2,132,199,0.18) !important;
+            width: 16px !important; height: 16px !important; margin-top: -4px !important;
+            opacity: 1 !important;
+        }
+        /* Checkbox / Radio */
+        [data-baseweb="checkbox"] .checkmark,
+        [data-baseweb="radio"] .radio {
+            background: linear-gradient(180deg,var(--accent),var(--accent-strong)) !important;
+            border: none !important;
+            box-shadow: 0 6px 18px rgba(2,132,199,0.12) !important;
+        }
+        [data-baseweb="checkbox"] label, [data-baseweb="radio"] label { color: var(--text) !important; opacity: 1 !important; }
+
+        /* force contrast for streamlit widgets */
+        .stSlider, .stCheckbox, .stRadio, .stSelectbox { color: var(--text) !important; }
+
+        /* Plotly dark defaults */
+        .js-plotly-plot .plotly .main-svg { background: transparent !important; }
+        .js-plotly-plot .g .xtick text, .js-plotly-plot .g .ytick text, .js-plotly-plot .g .axis-title { fill: var(--text) !important; }
+        .js-plotly-plot .legendtext { fill: var(--text) !important; }
+
+        /* Reduce opacity issues caused by BaseWeb */
+        [data-baseweb] { opacity: 1 !important; }
+
         </style>
         """,
         unsafe_allow_html=True,
@@ -509,6 +712,35 @@ def generate_bootstrap_indices(
     return idx
 
 # ─────────────────────────────
+# 복구 기간 계산
+# ─────────────────────────────
+def calculate_recovery_periods(value_path: np.ndarray) -> Tuple[float, float, float]:
+    """
+    복구 기간 계산 (월 단위)
+    (평균 복구기간, 최단 복구기간, 최장 복구기간)
+    """
+    S = value_path.shape[1]
+    recovery_periods = []
+    
+    for s in range(S):
+        path = value_path[:, s]
+        peak = np.maximum.accumulate(path)
+        
+        for t in range(1, len(path)):
+            if path[t] > peak[t-1]:
+                recovery = t
+                recovery_periods.append(recovery)
+    
+    if not recovery_periods:
+        return 0.0, 0.0, 0.0
+    
+    avg_recovery = float(np.mean(recovery_periods))
+    min_recovery = float(np.min(recovery_periods))
+    max_recovery = float(np.max(recovery_periods))
+    
+    return avg_recovery, min_recovery, max_recovery
+
+# ─────────────────────────────
 # 시뮬 (고정배분)
 # ─────────────────────────────
 def run_simulation_fixed_allocation(
@@ -572,17 +804,61 @@ def _apply_light_plotly(fig: go.Figure) -> None:
         template="plotly_white",
         paper_bgcolor="#ffffff",
         plot_bgcolor="#ffffff",
-        font=dict(color="#111827", size=13),
-        xaxis=dict(showgrid=True, gridcolor="#e5e7eb", zeroline=False),
-        yaxis=dict(showgrid=True, gridcolor="#e5e7eb", zeroline=False),
+        font=dict(color="#000000", size=13, family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", weight="bold"),
+        xaxis=dict(
+            showgrid=True, 
+            gridcolor="#e5e7eb", 
+            zeroline=False, 
+            title_font=dict(color="#000000", size=13),
+            tickfont=dict(color="#000000", size=12),
+        ),
+        yaxis=dict(
+            showgrid=True, 
+            gridcolor="#e5e7eb", 
+            zeroline=False, 
+            title_font=dict(color="#000000", size=13),
+            tickfont=dict(color="#000000", size=12),
+        ),
+        margin=dict(l=10, r=10, t=10, b=10),
+        legend_title_text="",
+    )
+
+def _apply_dark_plotly(fig: go.Figure) -> None:
+    fig.update_layout(
+        template="plotly_dark",
+        paper_bgcolor="#0b1220",
+        plot_bgcolor="#0b1220",
+        font=dict(color="#e6edf7", size=13),
+        xaxis=dict(
+            showgrid=True,
+            gridcolor="rgba(255,255,255,0.05)",
+            zeroline=False,
+        ),
+        yaxis=dict(
+            showgrid=True,
+            gridcolor="rgba(255,255,255,0.05)",
+            zeroline=False,
+        ),
         margin=dict(l=10, r=10, t=10, b=10),
         legend_title_text="",
     )
 
 def make_path_fanchart_mobile(value_path: np.ndarray) -> go.Figure:
-    T_plus_1, _ = value_path.shape
+    T_plus_1, S = value_path.shape
     paths = value_path
 
+    # 모든 시나리오 경로를 흐리게 표시 (최대 2000개로 제한)
+    fig = go.Figure()
+    for s in range(min(S, 2000)):
+        fig.add_trace(go.Scatter(
+            x=np.arange(T_plus_1),
+            y=paths[:, s] / EOK,
+            mode="lines",
+            line=dict(width=0.5, color="rgba(37,99,235,0.02)"),
+            hoverinfo="skip",
+            showlegend=False,
+        ))
+    
     pcts = np.percentile(paths, [5, 50, 95], axis=1)
     p5, p50, p95 = pcts[0] / EOK, pcts[1] / EOK, pcts[2] / EOK
 
@@ -590,19 +866,21 @@ def make_path_fanchart_mobile(value_path: np.ndarray) -> go.Figure:
     tick_vals = list(range(0, T_plus_1, 12))
     tick_text = [f"{v//12}년" for v in tick_vals]
 
-    fig = go.Figure()
+    # 밴드 영역 (단색 2D 느낌)
     fig.add_trace(go.Scatter(
         x=np.concatenate([x, x[::-1]]),
         y=np.concatenate([p95, p5[::-1]]),
         fill="toself",
-        fillcolor="rgba(37, 99, 235, 0.12)",
+        fillcolor="rgba(37, 99, 235, 0.04)",
         line=dict(color="rgba(0,0,0,0)"),
         hoverinfo="skip",
         name="범위(p5~p95)",
     ))
+    
+    # 중앙값 라인
     fig.add_trace(go.Scatter(
         x=x, y=p50, mode="lines",
-        line=dict(width=4, color="#2563eb"),
+        line=dict(width=2, color="#000000"),
         name="보통(p50)",
     ))
 
@@ -612,7 +890,7 @@ def make_path_fanchart_mobile(value_path: np.ndarray) -> go.Figure:
         xaxis=dict(title="시간", tickvals=tick_vals, ticktext=tick_text, automargin=True),
         yaxis=dict(title="자산(억원)", ticksuffix="억", tickformat=",.0f", automargin=True),
         hovermode="x unified",
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0, font=dict(color="#000000")),
     )
     return fig
 
@@ -632,6 +910,84 @@ def make_terminal_hist_mobile(terminal: np.ndarray, goal: float) -> go.Figure:
             line=dict(color="#ef4444", width=3, dash="dash"),
         )
     _apply_light_plotly(fig)
+    fig.update_layout(
+        height=300,
+        xaxis=dict(title="만기 잔고(억원)", ticksuffix="억", tickformat=",.0f", automargin=True),
+        yaxis=dict(title="개수(상대)", automargin=True),
+        showlegend=False,
+    )
+    return fig
+
+
+def make_path_fanchart_dark(value_path: np.ndarray) -> go.Figure:
+    T_plus_1, S = value_path.shape
+    paths = value_path
+    pcts = np.percentile(paths, [5, 50, 95], axis=1)
+    p5, p50, p95 = pcts[0]/EOK, pcts[1]/EOK, pcts[2]/EOK
+
+    x = np.arange(T_plus_1)
+    tick_vals = list(range(0, T_plus_1, 12))
+    tick_text = [f"{v//12}년" for v in tick_vals]
+
+    fig = go.Figure()
+    
+    # 모든 개별 경로를 흐리게 표시
+    sample_indices = np.random.choice(S, min(150, S), replace=False)
+    for idx in sample_indices:
+        scenario_path = paths[:, idx] / EOK
+        fig.add_trace(go.Scatter(
+            x=x, y=scenario_path,
+            mode="lines",
+            line=dict(width=0.5, color="rgba(100, 150, 220, 0.08)"),
+            hoverinfo="skip",
+            showlegend=False,
+        ))
+    
+    # 밴드
+    fig.add_trace(go.Scatter(
+        x=np.concatenate([x, x[::-1]]),
+        y=np.concatenate([p95, p5[::-1]]),
+        fill="toself",
+        fillcolor="rgba(59,130,246,0.08)",
+        line=dict(color="rgba(0,0,0,0)"),
+        hoverinfo="skip",
+        name="p5‑p95",
+    ))
+    # 중앙값
+    fig.add_trace(go.Scatter(
+        x=x, y=p50, mode="lines",
+        line=dict(width=4, color="#3b82f6"),
+        name="중앙값",
+        hovertemplate="중앙값: %{y:.2f}억<br>%{x}개월<extra></extra>",
+    ))
+
+    _apply_dark_plotly(fig)
+    fig.update_layout(
+        height=360,
+        xaxis=dict(title="시간", tickvals=tick_vals, ticktext=tick_text, automargin=True),
+        yaxis=dict(title="자산(억원)", ticksuffix="억", tickformat=",.0f", automargin=True),
+        hovermode="x unified",
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+    )
+    return fig
+
+
+def make_terminal_hist_dark(terminal: np.ndarray, goal: float) -> go.Figure:
+    x = (terminal / EOK).astype(float)
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(
+        x=x, nbinsx=50,
+        marker=dict(color="rgba(59,130,246,0.5)"),
+        name="분포",
+    ))
+    if float(goal) > 0:
+        goal_e = float(goal) / EOK
+        fig.add_shape(
+            type="line", x0=goal_e, x1=goal_e,
+            y0=0, y1=1, yref="paper",
+            line=dict(color="#ef4444", width=3, dash="dash"),
+        )
+    _apply_dark_plotly(fig)
     fig.update_layout(
         height=300,
         xaxis=dict(title="만기 잔고(억원)", ticksuffix="억", tickformat=",.0f", automargin=True),
@@ -681,42 +1037,34 @@ def reset_data_state() -> None:
 # 메인
 # ─────────────────────────────
 def main() -> None:
-    st.set_page_config(page_title="포트폴리오 시뮬레이터", layout="centered")
+    st.set_page_config(page_title="포트폴리오 시뮬레이터", layout="centered", initial_sidebar_state="collapsed")
     apply_light_css()
     init_session_state()
 
     st.title("📊 포트폴리오 시뮬레이터")
-    st.markdown(
-        """
-        <div style='background: linear-gradient(135deg, #e0e7ff 0%, #f0f9ff 100%); 
-                    padding: 1rem; border-radius: 10px; border-left: 4px solid #2563eb; 
-                    margin-bottom: 1.5rem;'>
-            <p style='margin: 0; color: #1e40af; font-size: 0.95rem;'>
-                📈 과거 데이터를 바탕으로 <strong>'가능한 범위'</strong>를 보여주는 도구예요. 
-                <br/>확정 예측이 아니며, 투자 결정의 참고 자료로만 사용해주세요.
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.info("📈 과거 데이터를 바탕으로 '가능한 범위'를 보여주는 도구예요. 확정 예측이 아니며, 투자 결정의 참고 자료로만 사용해주세요.")
 
     # ── 사이드바(입력 최소)
     with st.sidebar:
         st.subheader("⚙️ 입력")
 
-        years = st.slider("기간(년)", 5, 40, 30)
-        dividend_reinvest = st.checkbox("배당 재투자", value=True)
+        with st.container(border=True):
+            st.caption("📅 투자 기간")
+            years = st.slider("기간(년)", 5, 40, 30, label_visibility="collapsed")
+            dividend_reinvest = st.checkbox("배당 재투자", value=True)
 
-        initial_capital = st.number_input("초기금(원)", 0, 1_000_000_000, 0, 100_000)
-        monthly_contribution = st.number_input("월 납입(원)", 0, 10_000_000, 500_000, 50_000)
-        goal_amount = st.number_input("목표(원)", 0, 10_000_000_000, 100_000_000, 1_000_000)
+        with st.container(border=True):
+            st.caption("💰 자금 설정")
+            initial_capital = st.number_input("초기금(원)", 0, 1_000_000_000, 0, 100_000)
+            monthly_contribution = st.number_input("월 납입(원)", 0, 10_000_000, 500_000, 50_000)
+            goal_amount = st.number_input("목표(원)", 0, 10_000_000_000, 100_000_000, 1_000_000)
 
-        st.divider()
-        st.subheader("💼 자산 구성(최대 5개)")
-        st.text_area("티커", key="tickers_input", height=90, help="예: SGOV, QQQM, VOO, 005930.KS")
-        st.text_area("비중(%)", key="weights_input", height=90, help="티커 순서대로. 합이 100이어야 합니다.")
+        with st.container(border=True):
+            st.caption("💼 자산 구성(최대 5개)")
+            st.text_area("티커", key="tickers_input", height=80, help="예: SGOV, QQQM, VOO, 005930.KS", label_visibility="collapsed")
+            st.text_area("비중(%)", key="weights_input", height=80, help="티커 순서대로. 합이 100이어야 합니다.", label_visibility="collapsed")
 
-        run_btn = st.button("🚀 계산하기", use_container_width=True)
+        run_btn = st.button("🧮 계산하기", use_container_width=True)
 
         with st.expander("🔧 고급 설정", expanded=False):
             block_label = st.selectbox("블록(월)", ["랜덤(6~12)", "6개월 고정", "9개월 고정", "12개월 고정"], index=0)
@@ -841,7 +1189,7 @@ def main() -> None:
     if st.session_state.get("last_error"):
         st.error(f"실행 실패: {st.session_state['last_error']}")
 
-    # ── 결과 표시(모바일: 금액 먼저)
+    # ── 결과 표시
     if not st.session_state["sim_completed"]:
         st.info("👈 왼쪽 패널에서 입력하고 **🚀 계산하기**를 눌러주세요!")
         return
@@ -853,53 +1201,73 @@ def main() -> None:
     goal_prob = float(np.mean(terminal >= float(goal_amount))) if float(goal_amount) > 0 else np.nan
     total_principal = float(initial_capital) + float(monthly_contribution) * (int(years) * 12)
 
-    # 1티어 카드(금액)
-    st.subheader("✨ 시뮬레이션 결과")
-    st.metric("보통은(중앙값)", format_krw_readable(p50))
-    c1, c2 = st.columns(2)
-    c1.metric("보수적으로(p5)", format_krw_readable(p5))
-    c2.metric("낙관적으로(p95)", format_krw_readable(p95))
+    # 카드 요약 (2x2 그리드)
+    st.subheader("🎮 시뮬레이션 결과")
+    row1_col1, row1_col2 = st.columns([1, 1], gap="medium")
+    row1_col1.metric("평균값", krw_compact(p50))
+    row1_col2.metric("총 납입액", krw_compact(total_principal))
 
-    st.metric("총 납입액", format_krw_readable(total_principal))
+    row2_col1, row2_col2 = st.columns([1, 1], gap="medium")
+    row2_col1.metric("보수적(p5)", krw_compact(p5))
+    row2_col2.metric("낙관적(p95)", krw_compact(p95))
 
-    # 2티어: 목표확률(작게)
     if float(goal_amount) > 0:
-        st.caption(f"목표 {format_krw_readable(goal_amount)} **만기 달성 확률**: **{pct_str01(goal_prob)}**")
+        st.metric("🎯 목표 달성 확률", f"{goal_prob*100:.1f}%")
+        st.progress(goal_prob)
 
-    # 미니 메시지
-    st.markdown(
-        f"""
-        <div style='background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); 
-                    padding: 1.2rem; border-radius: 10px; border-left: 4px solid #d97706; 
-                    margin: 1.5rem 0;'>
-            <p style='margin: 0; color: #92400e; font-size: 0.95rem; line-height: 1.6;'>
-                <strong>💡 예상 범위</strong><br/>
-                {years}년 동안 월 <strong>{krw_compact(monthly_contribution)}</strong> 기준으로,<br/>
-                보통은 <span style='color: #2563eb; font-weight: bold;'>{krw_compact(p50)}</span>,
-                보수적으로 <span style='color: #d97706; font-weight: bold;'>{krw_compact(p5)}</span>,
-                낙관적으로 <span style='color: #059669; font-weight: bold;'>{krw_compact(p95)}</span>
-            </p>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
+    tab1, tab2 = st.tabs(["자산 경로", "만기 분포"])
+    with tab1:
+        fig1 = make_path_fanchart_mobile(value_path)
+        try:
+            fig1.update_layout(height=280, showlegend=False, font=dict(size=10))
+            fig1.update_xaxes(tickfont=dict(size=10))
+            fig1.update_yaxes(tickfont=dict(size=10))
+        except Exception:
+            pass
+        st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
+    with tab2:
+        fig2 = make_terminal_hist_mobile(terminal, float(goal_amount))
+        try:
+            fig2.update_layout(height=250, showlegend=False, font=dict(size=10))
+            fig2.update_xaxes(tickfont=dict(size=10))
+            fig2.update_yaxes(tickfont=dict(size=10))
+        except Exception:
+            pass
+        st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
 
-    # 그래프는 접기(신뢰 보강)
-    with st.expander("� 예상 자산 추이(그래프 보기)", expanded=False):
-        st.plotly_chart(make_path_fanchart_mobile(value_path), use_container_width=True, config={"displayModeBar": False})
-        st.plotly_chart(make_terminal_hist_mobile(terminal, float(goal_amount)), use_container_width=True, config={"displayModeBar": False})
+    # 상세 분석/다운로드 섹션
+    st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
+    with st.expander("🛠 상세 분석 (고급)", expanded=False):
+        # 복구 기간 계산
+        avg_recovery, min_recovery, max_recovery = calculate_recovery_periods(value_path)
+        
+        # 📊 리스크 분석
+        st.subheader("📊 리스크 분석")
+        r1, r2 = st.columns(2)
+        r1.metric("최대 낙폭(MDD)", f"{float(np.median(st.session_state['mdd']))*100:.2f}%")
+        r2.metric("MDD 범위", f"{float(np.min(st.session_state['mdd']))*100:.1f}% ~ {float(np.max(st.session_state['mdd']))*100:.1f}%")
 
-    # 상세/다운로드도 접기
-    with st.expander("� 상세 분석(고급)", expanded=False):
-        # 리스크(낙폭)
-        mdd_med = float(np.median(st.session_state["mdd"]))
-        st.caption(f"최대 낙폭(MDD) 중앙값: {mdd_med*100:.1f}% (참고)")
+        st.divider()
 
+        # ⏱️ 복구 기간 분석
+        st.subheader("⏱️ 복구 기간 분석")
+        rec1, rec2, rec3 = st.columns(3)
+        rec1.metric("평균 복구기간", f"{int(avg_recovery)}개월")
+        rec2.metric("최단 복구기간", f"{int(min_recovery)}개월")
+        rec3.metric("최장 복구기간", f"{int(max_recovery)}개월")
+
+        st.divider()
+
+        # 🎯 현실모드 타겟
+        st.subheader("🎯 현실모드 타겟(연 수익률)")
         targets_used = st.session_state.get("targets_used", None)
-        if targets_used is not None:
-            st.write("현실모드 타겟(연)")
-            st.write({k: f"{v*100:.2f}%" for k, v in targets_used.items()})
-
+        if targets_used:
+            t_cols = st.columns(len(targets_used))
+            for (ticker, rate), col in zip(targets_used.items(), t_cols):
+                col.metric(ticker, f"{rate*100:.2f}%")
+        else:
+            st.metric("SGOV", "3.50%")
+        
         df_out = pd.DataFrame({
             "scenario": np.arange(len(terminal)),
             "terminal_wealth": terminal,
