@@ -554,11 +554,11 @@ def reset_data_state() -> None:
 # 메인
 # ─────────────────────────────
 def main() -> None:
-    st.set_page_config(page_title="현실 포트폴리오 시뮬레이터", layout="centered")
+    st.set_page_config(page_title="포트폴리오 시뮬레이터", layout="centered")
     apply_light_css()
     init_session_state()
 
-    st.title("📱 현실 포트폴리오 시뮬레이터")
+    st.title("📱포트폴리오 시뮬레이터")
     st.caption("과거 데이터를 바탕으로 ‘가능한 범위’를 보여주는 도구예요. 확정 예측이 아닙니다.")
 
     # ── 사이드바(입력 최소)
