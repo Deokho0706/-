@@ -255,18 +255,6 @@ def apply_light_css() -> None:
             background: #2563eb !important;
             border: 2px solid #ffffff !important;
         }
-                /* 사이드바 캡션을 '입력' 텍스트 색과 동일하게 */
-                [data-testid="stSidebar"] [data-testid="stCaption"]{
-                    color:#0f172a !important;
-                    font-weight:700 !important;
-                    opacity:1 !important;
-                }
-
-                /* 혹시 다른 캡션 구조가 섞일 경우 대비 */
-                [data-testid="stSidebar"] small{
-                    color:#0f172a !important;
-                    opacity:1 !important;
-                }
 
                 /* BaseWeb 위젯 내부 텍스트도 동일하게 */
                 [data-testid="stSidebar"] [data-baseweb]{
@@ -284,6 +272,19 @@ def apply_light_css() -> None:
                     div[data-testid="stContainer"]{ padding: 0.85rem !important; }
                     /* 메트릭 라벨/값 폰트 축소 */
                     div[data-testid="stMetricLabel"]{ font-size: 0.85rem !important; }
+                }
+
+                .krw-hint{
+                  color:#0f172a !important;
+                  font-weight:600 !important;
+                  font-size:0.88rem !important;
+                  margin-top:-6px;
+                  margin-bottom:8px;
+                  opacity:1 !important;
+                }
+
+                @media (max-width: 640px){
+                  .krw-hint{ font-size:0.82rem !important; }
                 }
                 </style>
         """,
@@ -387,6 +388,29 @@ def krw_compact(x: float) -> str:
         return f"{sign}{a/1e8:.2f}억"
     if a >= 1e4:
         return f"{sign}{a/1e4:.1f}만"
+    return f"{sign}{int(round(a)):,}원"
+
+def krw_unit_only(x: float) -> str:
+    """100,000,000 -> 1억 / 250,000,000 -> 2.5억 / 1,200,000 -> 120만 등"""
+    try:
+        v = float(x)
+    except Exception:
+        return "-"
+    sign = "-" if v < 0 else ""
+    a = abs(v)
+
+    if a >= 1e12:
+        val = a / 1e12
+        s = f"{val:.2f}".rstrip("0").rstrip(".")
+        return f"{sign}{s}조"
+    if a >= 1e8:
+        val = a / 1e8
+        s = f"{val:.2f}".rstrip("0").rstrip(".")
+        return f"{sign}{s}억"
+    if a >= 1e4:
+        val = a / 1e4
+        s = f"{val:.1f}".rstrip("0").rstrip(".")
+        return f"{sign}{s}만"
     return f"{sign}{int(round(a)):,}원"
 
 def format_krw_readable(x: float) -> str:
@@ -796,6 +820,107 @@ def run_simulation_fixed_allocation(
 
     return value_path, terminal, mdd
 
+
+# ─────────────────────────────
+# 터미널 전용 시뮬 (빠른 계산)
+# ─────────────────────────────
+def simulate_terminal_only(
+    hist_returns: np.ndarray,        # (N, A)
+    weights: np.ndarray,             # (A,)
+    years: int,
+    initial_capital: float,
+    monthly_contribution: float,
+    seed: int,
+    block_mode: str,
+    scenario_count: int,
+) -> np.ndarray:
+    """만기값(terminal)만 반환: 그래프/경로 저장 없이 빠르게 계산"""
+    T = int(years) * 12
+    S = int(scenario_count)
+    N, A = hist_returns.shape
+
+    rng = np.random.default_rng(int(seed))
+    indices = generate_bootstrap_indices(rng, N, T, S, block_mode)
+
+    w = weights.astype(np.float64, copy=False)
+    values = np.zeros((S, A), dtype=np.float64)
+    if float(initial_capital) > 0:
+        values[:] = float(initial_capital) * w[None, :]
+
+    for t in range(1, T + 1):
+        r = hist_returns[indices[:, t - 1], :]
+        values *= (1.0 + r)
+        if float(monthly_contribution) > 0:
+            values += float(monthly_contribution) * w[None, :]
+
+    return values.sum(axis=1)
+
+
+def required_monthly_contribution_for_prob(
+    hist_returns: np.ndarray,
+    weights: np.ndarray,
+    years: int,
+    initial_capital: float,
+    goal_amount: float,
+    seed: int,
+    block_mode: str,
+    scenario_count: int,
+    target_prob: float = 0.70,  # 70% 달성확률
+    max_monthly: float = 10_000_000,  # 탐색 상한(필요시 늘려도 됨)
+) -> Tuple[float, float]:
+    """
+    목표(goal_amount)를 target_prob 확률로 달성하기 위한 월납입금 추정.
+    반환: (필요 월납입금, 달성확률)
+    """
+    # 1) base(월납입 0) + unit(월납입 1원) 시뮬
+    base = simulate_terminal_only(
+        hist_returns, weights, years,
+        initial_capital=float(initial_capital),
+        monthly_contribution=0.0,
+        seed=seed, block_mode=block_mode,
+        scenario_count=scenario_count,
+    )
+
+    unit = simulate_terminal_only(
+        hist_returns, weights, years,
+        initial_capital=0.0,
+        monthly_contribution=1.0,   # 월 1원
+        seed=seed, block_mode=block_mode,
+        scenario_count=scenario_count,
+    )
+
+    # unit이 0에 가까운 경우 방어
+    unit = np.maximum(unit, 1e-12)
+
+    def prob(c: float) -> float:
+        return float(np.mean(base + c * unit >= float(goal_amount)))
+
+    # 이미 0원으로 목표 확률 달성하면 끝
+    p0 = prob(0.0)
+    if p0 >= float(target_prob):
+        return 0.0, p0
+
+    # 상한 찾기(두 배씩 늘리기)
+    lo, hi = 0.0, 100_000.0  # 10만원부터 시작
+    while hi < float(max_monthly) and prob(hi) < float(target_prob):
+        hi *= 2.0
+    hi = min(hi, float(max_monthly))
+
+    # max_monthly에서도 목표확률 달성 못하면 hi 반환
+    if prob(hi) < float(target_prob):
+        return hi, prob(hi)
+
+    # 이진탐색
+    for _ in range(40):  # 충분히 정밀
+        mid = (lo + hi) / 2.0
+        if prob(mid) >= float(target_prob):
+            hi = mid
+        else:
+            lo = mid
+
+    return hi, prob(hi)
+
+
 # ─────────────────────────────
 # Plotly
 # ─────────────────────────────
@@ -1056,8 +1181,31 @@ def main() -> None:
         with st.container(border=True):
             st.caption("💰 자금 설정")
             initial_capital = st.number_input("초기금(원)", 0, 1_000_000_000, 0, 100_000)
+            st.markdown(f"<div class='krw-hint'>≈ {krw_unit_only(initial_capital)}</div>", unsafe_allow_html=True)
             monthly_contribution = st.number_input("월 납입(원)", 0, 10_000_000, 500_000, 50_000)
+            st.markdown(f"<div class='krw-hint'>≈ {krw_unit_only(monthly_contribution)}</div>", unsafe_allow_html=True)
             goal_amount = st.number_input("목표(원)", 0, 10_000_000_000, 100_000_000, 1_000_000)
+            st.markdown(f"<div class='krw-hint'>≈ {krw_unit_only(goal_amount)}</div>", unsafe_allow_html=True)
+
+            st.divider()
+
+            need_plan = st.checkbox(
+                "🎯 목표 달성에 필요한 월 납입 계산",
+                value=True,
+                help="현재 설정(기간/자산/현실모드/시드) 기준으로, 목표 금액을 특정 확률로 달성하려면 월 얼마가 필요한지 계산합니다."
+            )
+
+            target_prob = st.slider(
+                "목표 달성 확률(%)",
+                50, 90, 70, 5,
+                help="예: 70%는 '10번 중 7번은 목표 달성' 수준으로 보수적으로 잡는 방식입니다."
+            ) / 100.0
+
+            show_graphs = st.checkbox(
+                "📊 그래프 표시",
+                value=False,
+                help="자산 경로와 만기 분포 그래프를 표시합니다. 계산 속도를 위해 기본적으로 OFF로 설정되어 있습니다."
+            )
 
         with st.container(border=True):
             st.caption("💼 자산 구성(최대 5개)")
@@ -1179,6 +1327,11 @@ def main() -> None:
             st.session_state["value_path"] = value_path
             st.session_state["terminal_wealth"] = terminal
             st.session_state["mdd"] = mdd
+            st.session_state["hist"] = hist
+            st.session_state["weights"] = weights
+            st.session_state["block_mode"] = block_mode
+            st.session_state["seed"] = seed
+            st.session_state["years"] = years
             st.session_state["sim_completed"] = True
             st.session_state["last_error"] = None
         except Exception as e:
@@ -1204,36 +1357,63 @@ def main() -> None:
     # 카드 요약 (2x2 그리드)
     st.subheader("🎮 시뮬레이션 결과")
     row1_col1, row1_col2 = st.columns([1, 1], gap="medium")
-    row1_col1.metric("평균값", krw_compact(p50))
+    row1_col1.metric("📊 평균 시나리오", krw_compact(p50))
     row1_col2.metric("총 납입액", krw_compact(total_principal))
 
     row2_col1, row2_col2 = st.columns([1, 1], gap="medium")
-    row2_col1.metric("보수적(p5)", krw_compact(p5))
-    row2_col2.metric("낙관적(p95)", krw_compact(p95))
+    row2_col1.metric("📉 보수 시나리오 (하위 5%)", krw_compact(p5))
+    row2_col2.metric("📈 낙관 시나리오 (상위 5%)", krw_compact(p95))
 
     if float(goal_amount) > 0:
         st.metric("🎯 목표 달성 확률", f"{goal_prob*100:.1f}%")
         st.progress(goal_prob)
 
-    tab1, tab2 = st.tabs(["자산 경로", "만기 분포"])
-    with tab1:
-        fig1 = make_path_fanchart_mobile(value_path)
-        try:
-            fig1.update_layout(height=280, showlegend=False, font=dict(size=10))
-            fig1.update_xaxes(tickfont=dict(size=10))
-            fig1.update_yaxes(tickfont=dict(size=10))
-        except Exception:
-            pass
-        st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
-    with tab2:
-        fig2 = make_terminal_hist_mobile(terminal, float(goal_amount))
-        try:
-            fig2.update_layout(height=250, showlegend=False, font=dict(size=10))
-            fig2.update_xaxes(tickfont=dict(size=10))
-            fig2.update_yaxes(tickfont=dict(size=10))
-        except Exception:
-            pass
-        st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
+        # 필요 월납입금 계산
+        if need_plan:
+            with st.spinner("필요 월 납입 계산 중..."):
+                hist = st.session_state.get("hist")
+                weights = st.session_state.get("weights")
+                block_mode = st.session_state.get("block_mode")
+                seed = st.session_state.get("seed")
+                sim_years = st.session_state.get("years")
+
+                if hist is not None and weights is not None and block_mode is not None and seed is not None and sim_years is not None:
+                    req_monthly, achieved = required_monthly_contribution_for_prob(
+                        hist_returns=hist,
+                        weights=weights,
+                        years=int(sim_years),
+                        initial_capital=float(initial_capital),
+                        goal_amount=float(goal_amount),
+                        seed=int(seed),
+                        block_mode=block_mode,
+                        scenario_count=SCENARIO_COUNT,
+                        target_prob=float(target_prob),
+                        max_monthly=10_000_000,
+                    )
+
+                    st.metric("🧾 목표 달성에 필요한 월 납입(추정)", format_krw_readable(req_monthly))
+                    st.caption(f"달성확률(추정): {achieved*100:.1f}%  |  목표: {format_krw_readable(goal_amount)}")
+
+    if show_graphs:
+        tab1, tab2 = st.tabs(["자산 경로", "만기 분포"])
+        with tab1:
+            fig1 = make_path_fanchart_mobile(value_path)
+            try:
+                fig1.update_layout(height=280, showlegend=False, font=dict(size=10))
+                fig1.update_xaxes(tickfont=dict(size=10))
+                fig1.update_yaxes(tickfont=dict(size=10))
+            except Exception:
+                pass
+            st.plotly_chart(fig1, use_container_width=True, config={"displayModeBar": False})
+        with tab2:
+            fig2 = make_terminal_hist_mobile(terminal, float(goal_amount))
+            try:
+                fig2.update_layout(height=250, showlegend=False, font=dict(size=10))
+                fig2.update_xaxes(tickfont=dict(size=10))
+                fig2.update_yaxes(tickfont=dict(size=10))
+            except Exception:
+                pass
+            st.plotly_chart(fig2, use_container_width=True, config={"displayModeBar": False})
 
     # 상세 분석/다운로드 섹션
     st.markdown("<div style='margin-top:16px;'></div>", unsafe_allow_html=True)
